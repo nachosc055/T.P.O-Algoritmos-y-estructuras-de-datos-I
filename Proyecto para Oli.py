@@ -123,11 +123,6 @@ def asignarTrabajo():
     listaDeTrabajosPendientes.append(nuevoTrabajo)
     print("trabajo asignado con exito!")
 
-    listaDeTrabajosPendientes.append(nuevoTrabajo)
-    print("trabajo asignado con exito!")
-    
-    
-    
 
 def cambioEstadoTrabajo():
     nombreBuscado = input("ingrese el nombre del cliente: ")
@@ -171,7 +166,7 @@ def trabajoDelDia():
         print("no hay trabajos para esa fecha")
         return
     
-    print("trabajos para el " + fecha + ":")
+    print("=== trabajos para el " + fecha + ":")
     for t in encontrados:
         print("  tecnico: " + t["nombreDelTrabajador"])
         print("  cliente: " + t["clientePorAtender"])
@@ -181,6 +176,85 @@ def trabajoDelDia():
         
         
         
+def mostrarUnTrabajo(t):
+    print("  cliente: " + t["clientePorAtender"])
+    print("  direccion: " + t["direccionAVisitar"])
+    print("  tarea: " + t["trabajoARealizar"])
+    print("  tecnico: " + t["nombreDelTrabajador"])
+    print("  fecha: " + t["fecha"] + " | hora: " + t["horarioDeVisita"])
+    print("  estado: " + t["estado"])
+    if t["detalles"] != "":
+        print("  detalles: " + t["detalles"])
+    print("  ---")
+
+
+def mostrarTrabajos():
+    if len(listaDeTrabajosPendientes) == 0:
+        print("no hay trabajos cargados")
+        return
+    print("=== todos los trabajos (" + str(len(listaDeTrabajosPendientes)) + ") ===")
+    for t in listaDeTrabajosPendientes:
+        mostrarUnTrabajo(t)
+
+
+def trabajosPendientes():
+    encontrados = []
+    for t in listaDeTrabajosPendientes:
+        if t["estado"] == "pendiente" or t["estado"] == "en proceso":
+            encontrados.append(t)
+
+    if len(encontrados) == 0:
+        print("no hay trabajos pendientes, estan todos al dia :)")
+        return
+
+    print("=== trabajos pendientes (" + str(len(encontrados)) + ") ===")
+    for t in encontrados:
+        mostrarUnTrabajo(t)
+
+
+def trabajosRealizados():
+    encontrados = []
+    for t in listaDeTrabajosPendientes:
+        if t["estado"] == "terminado" or t["estado"] == "cobrado":
+            encontrados.append(t)
+
+    if len(encontrados) == 0:
+        print("todavia no hay trabajos realizados")
+        return
+
+    print("=== trabajos realizados (" + str(len(encontrados)) + ") ===")
+    for t in encontrados:
+        mostrarUnTrabajo(t)
+
+
+def trabajosTotales():
+    total = len(listaDeTrabajosPendientes)
+    if total == 0:
+        print("no hay trabajos cargados")
+        return
+
+    pendientes = 0
+    enProceso = 0
+    terminados = 0
+    cobrados = 0
+    for t in listaDeTrabajosPendientes:
+        if t["estado"] == "pendiente":
+            pendientes += 1
+        elif t["estado"] == "en proceso":
+            enProceso += 1
+        elif t["estado"] == "terminado":
+            terminados += 1
+        elif t["estado"] == "cobrado":
+            cobrados += 1
+
+    print("=== resumen de trabajos ===")
+    print("total de trabajos: " + str(total))
+    print("  pendientes: " + str(pendientes))
+    print("  en proceso: " + str(enProceso))
+    print("  terminados: " + str(terminados))
+    print("  cobrados: " + str(cobrados))
+
+
 opcion = ""
 while opcion != "0":
     print("\n1 - Cargar cliente")
@@ -188,6 +262,10 @@ while opcion != "0":
     print("3 - Asignar trabajo")
     print("4 - Cambiar estado de trabajo")
     print("5 - Trabajos del dia")
+    print("6 - Mostrar todos los trabajos")
+    print("7 - Trabajos pendientes")
+    print("8 - Trabajos realizados")
+    print("9 - Resumen de trabajos (totales)")
     print("0 - Salir")
     opcion = input("elegí una opción: ")
     
@@ -201,3 +279,11 @@ while opcion != "0":
         cambioEstadoTrabajo()
     elif opcion == "5":
         trabajoDelDia()
+    elif opcion == "6":
+        mostrarTrabajos()
+    elif opcion == "7":
+        trabajosPendientes()
+    elif opcion == "8":
+        trabajosRealizados()
+    elif opcion == "9":
+        trabajosTotales()
