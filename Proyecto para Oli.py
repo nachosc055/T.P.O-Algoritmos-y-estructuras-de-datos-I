@@ -25,18 +25,35 @@ listaClientes = [
     },
 ]
 
-listaTrabajadores=[]
-listaDeTrabajosPendientes=[]
-listaDeTrabajosTerminados=[]
+listaTrabajadores = [
+    {
+        "idTrabajador": 0,
+        "nombre": "Carlos",
+        "especialidad": "herreria y equipos comerciales",
+    },
+    {
+        "idTrabajador": 1,
+        "nombre": "Mellizo",
+        "especialidad": "electricidad e instalacion de aires",
+    },
+    {
+        "idTrabajador": 2,
+        "nombre": "Fede",
+        "especialidad": "mantenimiento y limpieza",
+    },
+]
+
+listaDeTrabajosPendientes = []
+listaDeTrabajosTerminados = []
 
 
 def cargaDeDatosCliente():
-    idCliente=0
-    if len(listaClientes)==0:
-        idCliente=0
+    idCliente = 0
+    if len(listaClientes) == 0:
+        idCliente = 0
     else:
         idMaximo = listaClientes[-1]["idCliente"]
-        idCliente = idMaximo+1
+        idCliente = idMaximo + 1
 
     nombreCliente = input("ingrese el nombre del cliente: ")
     while nombreCliente == "":
@@ -50,15 +67,42 @@ def cargaDeDatosCliente():
     while telefonoCliente == "":
         telefonoCliente = input("el telefono no puede estar vacio: ")
 
-    nuevoCliente={
-        "idCliente":idCliente,
-        "nombre":nombreCliente,
-        "direccion":direccionCliente,
-        "telefono":telefonoCliente,
+    nuevoCliente = {
+        "idCliente": idCliente,
+        "nombre": nombreCliente,
+        "direccion": direccionCliente,
+        "telefono": telefonoCliente,
     }
 
     listaClientes.append(nuevoCliente)
     print("cliente creado con exito :)")
+
+
+def cargaDatosTrabajador():
+    idTrabajador = 0
+    if len(listaTrabajadores) == 0:
+        idTrabajador = 0
+    else:
+        idMaximo = listaTrabajadores[-1]["idTrabajador"]
+        idTrabajador = idMaximo + 1
+
+    nombreTrabajador = input("ingrese el nombre del trabajador: ")
+    while nombreTrabajador == "" or nombreTrabajador.isdigit():
+        nombreTrabajador = input("el nombre no puede estar vacio ni ser un numero: ")
+
+    especialidad = input("ingrese la especialidad del trabajador (ej: electricidad, herreria): ")
+    while especialidad == "":
+        especialidad = input("la especialidad no puede estar vacia: ")
+
+    nuevoTrabajador = {
+        "idTrabajador": idTrabajador,
+        "nombre": nombreTrabajador,
+        "especialidad": especialidad,
+    }
+
+    listaTrabajadores.append(nuevoTrabajador)
+    print("trabajador cargado con exito :)")
+
 
 def buscarCliente():
     clienteABuscar = input("ingrese el nombre del cliente a buscar: ")
@@ -75,21 +119,41 @@ def buscarCliente():
 
 
 def asignarTrabajo():
-    clientePorAtender = input("ingrese el nombre del cliente al que hay que visitar: ")
-    while clientePorAtender == "" or clientePorAtender.isdigit():
-        clientePorAtender = input("el nombre no puede estar vacio ni ser un numero: ")
+    if len(listaClientes) == 0:
+        print("no hay clientes registrados, cargue uno primero")
+        return
 
-    direccionAVisitar = input("ingrese la direccion del cliente: ")
-    while direccionAVisitar == "":
-        direccionAVisitar = input("la direccion no puede estar vacia: ")
+    print("=== clientes registrados ===")
+    for i in range(len(listaClientes)):
+        print(str(i+1) + " - " + listaClientes[i]["nombre"] + " | " + listaClientes[i]["direccion"])
+
+    opcionCliente = int(input("selecciona el numero del cliente: "))
+    while opcionCliente < 1 or opcionCliente > len(listaClientes):
+        opcionCliente = int(input("opcion invalida, elegi de nuevo: "))
+
+    clienteSeleccionado = listaClientes[opcionCliente - 1]
+    clientePorAtender = clienteSeleccionado["nombre"]
+    direccionAVisitar = clienteSeleccionado["direccion"]
+    print("cliente seleccionado: " + clientePorAtender + " | " + direccionAVisitar)
 
     trabajoARealizar = input("ingrese el trabajo hay que realizarle al cliente: ")
     while trabajoARealizar == "":
         trabajoARealizar = input("el trabajo no puede estar vacio: ")
 
-    nombreDelTrabajador = input("ingrese el nombre del trabajador asignado: ")
-    while nombreDelTrabajador == "" or nombreDelTrabajador.isdigit():
-        nombreDelTrabajador = input("el nombre no puede estar vacio ni ser un numero: ")
+    if len(listaTrabajadores) == 0:
+        print("no hay trabajadores registrados, cargue uno primero")
+        return
+
+    print("=== trabajadores disponibles ===")
+    for i in range(len(listaTrabajadores)):
+        print(str(i+1) + " - " + listaTrabajadores[i]["nombre"] + " | " + listaTrabajadores[i]["especialidad"])
+
+    opcionTrabajador = int(input("selecciona el numero del trabajador: "))
+    while opcionTrabajador < 1 or opcionTrabajador > len(listaTrabajadores):
+        opcionTrabajador = int(input("opcion invalida, elegi de nuevo: "))
+
+    nombreDelTrabajador = listaTrabajadores[opcionTrabajador - 1]["nombre"]
+    print("trabajador seleccionado: " + nombreDelTrabajador)
 
     horarioDeVisita = input("ingrese el horario de la visita (HH:MM): ")
     while True:
@@ -109,6 +173,9 @@ def asignarTrabajo():
 
     detalles = input("ingrese algun detalle o descripcion en caso de desearlo: ")
 
+    precio = input("ingrese el precio del trabajo (o Enter si todavia no sabe): ")
+    precio = int(precio) if precio.isdigit() else 0
+
     nuevoTrabajo = {
         "clientePorAtender": clientePorAtender,
         "direccionAVisitar": direccionAVisitar,
@@ -118,6 +185,8 @@ def asignarTrabajo():
         "fecha": fecha,
         "detalles": detalles,
         "estado": "pendiente",
+        "precio": precio,
+        "pagado": 0,
     }
 
     listaDeTrabajosPendientes.append(nuevoTrabajo)
@@ -151,21 +220,31 @@ def cambioEstadoTrabajo():
 
     listaDeTrabajosPendientes[indice]["estado"] = estadosTrabajo[opcion - 1]
     print("estado actualizado a: " + estadosTrabajo[opcion - 1])
-    
-    
+
+    if estadosTrabajo[opcion - 1] == "cobrado":
+        montoPago = input("cuanto pago el cliente? (precio total: $" + str(listaDeTrabajosPendientes[indice]["precio"]) + "): ")
+        while not montoPago.isdigit():
+            montoPago = input("ingresa un numero valido: ")
+        listaDeTrabajosPendientes[indice]["pagado"] += int(montoPago)
+        deuda = listaDeTrabajosPendientes[indice]["precio"] - listaDeTrabajosPendientes[indice]["pagado"]
+        if deuda > 0:
+            print("pago parcial registrado. todavia debe: $" + str(deuda))
+        else:
+            print("pago completo! no debe nada :)")
+
 
 def trabajoDelDia():
     fecha = input("ingrese la fecha a consultar (DD/MM/AAAA): ")
     encontrados = []
-    
+
     for trabajo in listaDeTrabajosPendientes:
         if trabajo["fecha"] == fecha:
             encontrados.append(trabajo)
-    
+
     if len(encontrados) == 0:
         print("no hay trabajos para esa fecha")
         return
-    
+
     print("=== trabajos para el " + fecha + ":")
     for t in encontrados:
         print("  tecnico: " + t["nombreDelTrabajador"])
@@ -173,9 +252,8 @@ def trabajoDelDia():
         print("  tarea: " + t["trabajoARealizar"])
         print("  hora: " + str(t["horarioDeVisita"]))
         print("  ---")
-        
-        
-        
+
+
 def mostrarUnTrabajo(t):
     print("  cliente: " + t["clientePorAtender"])
     print("  direccion: " + t["direccionAVisitar"])
@@ -185,6 +263,8 @@ def mostrarUnTrabajo(t):
     print("  estado: " + t["estado"])
     if t["detalles"] != "":
         print("  detalles: " + t["detalles"])
+    deuda = t["precio"] - t["pagado"]
+    print("  precio: $" + str(t["precio"]) + " | pagado: $" + str(t["pagado"]) + " | debe: $" + str(deuda))
     print("  ---")
 
 
@@ -247,28 +327,37 @@ def trabajosTotales():
         elif t["estado"] == "cobrado":
             cobrados += 1
 
+    totalFacturado = sum(t["precio"] for t in listaDeTrabajosPendientes)
+    totalCobrado = sum(t["pagado"] for t in listaDeTrabajosPendientes)
+    totalDeuda = totalFacturado - totalCobrado
+
     print("=== resumen de trabajos ===")
     print("total de trabajos: " + str(total))
     print("  pendientes: " + str(pendientes))
     print("  en proceso: " + str(enProceso))
     print("  terminados: " + str(terminados))
     print("  cobrados: " + str(cobrados))
+    print("  -------------------------")
+    print("  total facturado: $" + str(totalFacturado))
+    print("  total cobrado: $" + str(totalCobrado))
+    print("  total que te deben: $" + str(totalDeuda))
 
 
 opcion = ""
 while opcion != "0":
-    print("\n1 - Cargar cliente")
-    print("2 - Buscar cliente")
-    print("3 - Asignar trabajo")
-    print("4 - Cambiar estado de trabajo")
-    print("5 - Trabajos del dia")
-    print("6 - Mostrar todos los trabajos")
-    print("7 - Trabajos pendientes")
-    print("8 - Trabajos realizados")
-    print("9 - Resumen de trabajos (totales)")
-    print("0 - Salir")
+    print("\n1  - Cargar cliente")
+    print("2  - Buscar cliente")
+    print("3  - Asignar trabajo")
+    print("4  - Cambiar estado de trabajo")
+    print("5  - Trabajos del dia")
+    print("6  - Mostrar todos los trabajos")
+    print("7  - Trabajos pendientes")
+    print("8  - Trabajos realizados")
+    print("9  - Resumen de trabajos (totales)")
+    print("10 - Cargar trabajador")
+    print("0  - Salir")
     opcion = input("elegí una opción: ")
-    
+
     if opcion == "1":
         cargaDeDatosCliente()
     elif opcion == "2":
@@ -287,3 +376,5 @@ while opcion != "0":
         trabajosRealizados()
     elif opcion == "9":
         trabajosTotales()
+    elif opcion == "10":
+        cargaDatosTrabajador()
