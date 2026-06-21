@@ -1,51 +1,57 @@
-listaClientes = [
-    {
-        "idCliente": 0,
-        "nombre": "lucas milani",
-        "direccion": "9JL 1282",
-        "telefono": "+54 9 11 28323529",
-    },
-    {
-        "idCliente": 1,
-        "nombre": "rosa fernandez",
-        "direccion": "Av Corrientes 1420 piso 3B",
-        "telefono": "+54 9 11 45671234",
-    },
-    {
-        "idCliente": 2,
-        "nombre": "consorcio pringles",
-        "direccion": "Pringles 850",
-        "telefono": "+54 9 11 33445566",
-    },
-    {
-        "idCliente": 3,
-        "nombre": "fabrica aberturas lopez",
-        "direccion": "Av. San Martin 2100",
-        "telefono": "+54 9 11 22334455",
-    },
-]
+import os
+import json
 
-listaTrabajadores = [
-    {
-        "idTrabajador": 0,
-        "nombre": "Carlos",
-        "especialidad": "herreria y equipos comerciales",
-    },
-    {
-        "idTrabajador": 1,
-        "nombre": "Mellizo",
-        "especialidad": "electricidad e instalacion de aires",
-    },
-    {
-        "idTrabajador": 2,
-        "nombre": "Fede",
-        "especialidad": "mantenimiento y limpieza",
-    },
-]
+RUTA_BASE = os.path.dirname(os.path.abspath(__file__))
+RUTA_CLIENTES = os.path.join(RUTA_BASE, "clientes.json")
+RUTA_TRABAJADORES = os.path.join(RUTA_BASE, "trabajadores.json")
+
+listaClientes = []
+
+listaTrabajadores = []
 
 listaDeTrabajosPendientes = []
 listaDeTrabajosTerminados = []
 
+def cargarClientes():
+    global listaClientes
+    if os.path.exists(RUTA_CLIENTES):
+        try:
+            with open(RUTA_CLIENTES, "r", encoding="utf-8") as archivo:
+                listaClientes = json.load(archivo)
+        except Exception as e:
+            print("ocurrio un error al cargar clientes.json, se usaran los datos por defecto:", e)
+    else:
+        # primera vez que se corre el programa: crea el archivo con los clientes de ejemplo
+        guardarClientes()
+
+
+def guardarClientes():
+    try:
+        with open(RUTA_CLIENTES, "w", encoding="utf-8") as archivo:
+            json.dump(listaClientes, archivo, indent=4, ensure_ascii=False)
+    except Exception as e:
+        print("ocurrio un error al guardar clientes.json:", e)
+
+
+def cargarTrabajadores():
+    global listaTrabajadores
+    if os.path.exists(RUTA_TRABAJADORES):
+        try:
+            with open(RUTA_TRABAJADORES, "r", encoding="utf-8") as archivo:
+                listaTrabajadores = json.load(archivo)
+        except Exception as e:
+            print("ocurrio un error al cargar trabajadores.json, se usaran los datos por defecto:", e)
+    else:
+        # primera vez que se corre el programa: crea el archivo con los trabajadores de ejemplo
+        guardarTrabajadores()
+
+
+def guardarTrabajadores():
+    try:
+        with open(RUTA_TRABAJADORES, "w", encoding="utf-8") as archivo:
+            json.dump(listaTrabajadores, archivo, indent=4, ensure_ascii=False)
+    except Exception as e:
+        print("ocurrio un error al guardar trabajadores.json:", e)
 
 def cargaDeDatosCliente():
     idCliente = 0
@@ -75,6 +81,7 @@ def cargaDeDatosCliente():
     }
 
     listaClientes.append(nuevoCliente)
+    guardarClientes()
     print("cliente creado con exito :)")
 
 
@@ -101,7 +108,30 @@ def cargaDatosTrabajador():
     }
 
     listaTrabajadores.append(nuevoTrabajador)
+    guardarTrabajadores()
     print("trabajador cargado con exito :)")
+
+
+def eliminarTrabajador():
+    if len(listaTrabajadores) == 0:
+        print("no hay trabajadores registrados")
+        return
+
+    print("=== trabajadores registrados ===")
+    for i in range(len(listaTrabajadores)):
+        print(str(i+1) + " - " + listaTrabajadores[i]["nombre"] + " | " + listaTrabajadores[i]["especialidad"])
+
+    opcion = int(input("selecciona el numero del trabajador a eliminar (0 para cancelar): "))
+    while opcion < 0 or opcion > len(listaTrabajadores):
+        opcion = int(input("opcion invalida, elegi de nuevo: "))
+
+    if opcion == 0:
+        print("operacion cancelada")
+        return
+
+    trabajadorEliminado = listaTrabajadores.pop(opcion - 1)
+    guardarTrabajadores()
+    print("trabajador eliminado: " + trabajadorEliminado["nombre"])
 
 
 def buscarCliente():
@@ -343,6 +373,9 @@ def trabajosTotales():
     print("  total que te deben: $" + str(totalDeuda))
 
 
+cargarClientes()
+cargarTrabajadores()
+
 opcion = ""
 while opcion != "0":
     print("\n1  - Cargar cliente")
@@ -355,6 +388,7 @@ while opcion != "0":
     print("8  - Trabajos realizados")
     print("9  - Resumen de trabajos (totales)")
     print("10 - Cargar trabajador")
+    print("11 - Eliminar trabajador")
     print("0  - Salir")
     opcion = input("elegí una opción: ")
 
@@ -378,3 +412,5 @@ while opcion != "0":
         trabajosTotales()
     elif opcion == "10":
         cargaDatosTrabajador()
+    elif opcion == "11":
+        eliminarTrabajador()
