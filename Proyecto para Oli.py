@@ -358,22 +358,13 @@ def trabajosTotales():
         print("no hay trabajos cargados")
         return
 
-    pendientes = 0
-    enProceso = 0
-    terminados = 0
-    cobrados = 0
-    for t in listaDeTrabajosPendientes:
-        if t["estado"] == "pendiente":
-            pendientes += 1
-        elif t["estado"] == "en proceso":
-            enProceso += 1
-        elif t["estado"] == "terminado":
-            terminados += 1
-        elif t["estado"] == "cobrado":
-            cobrados += 1
+    pendientes = len(list(filter(lambda x: x["estado"] == "pendiente", listaDeTrabajosPendientes)))
+    enProceso = len(list(filter(lambda x: x["estado"] == "en proceso", listaDeTrabajosPendientes)))
+    terminados = len(list(filter(lambda x: x["estado"] == "terminado", listaDeTrabajosPendientes)))
+    cobrados = len(list(filter(lambda x: x["estado"] == "cobrado", listaDeTrabajosPendientes)))
 
-    totalFacturado = sum(t["precio"] for t in listaDeTrabajosPendientes)
-    totalCobrado = sum(t["pagado"] for t in listaDeTrabajosPendientes)
+    totalFacturado = sum(map(lambda x: x["precio"], listaDeTrabajosPendientes))
+    totalCobrado = sum(map(lambda x: x["pagado"], listaDeTrabajosPendientes))
     totalDeuda = totalFacturado - totalCobrado
 
     print("=== resumen de trabajos ===")
@@ -386,6 +377,8 @@ def trabajosTotales():
     print("  total facturado: $" + str(totalFacturado))
     print("  total cobrado: $" + str(totalCobrado))
     print("  total que te deben: $" + str(totalDeuda))
+
+
 
 
 cargarClientes()
