@@ -28,7 +28,7 @@ def cargarClientes():
 def guardarClientes():
     try:
         with open(RUTA_CLIENTES, "w", encoding="utf-8") as archivo:
-            json.dump(listaClientes, archivo, indent=4, ensure_ascii=False)
+            json.dump(listaClientes, archivo, indent=4)
     except Exception as e:
         print("ocurrio un error al guardar clientes.json:", e)
 
@@ -49,7 +49,7 @@ def cargarTrabajadores():
 def guardarTrabajadores():
     try:
         with open(RUTA_TRABAJADORES, "w", encoding="utf-8") as archivo:
-            json.dump(listaTrabajadores, archivo, indent=4, ensure_ascii=False)
+            json.dump(listaTrabajadores, archivo, indent=4)
     except Exception as e:
         print("ocurrio un error al guardar trabajadores.json:", e)
 
