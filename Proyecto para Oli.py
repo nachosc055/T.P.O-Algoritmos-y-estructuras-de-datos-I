@@ -1,16 +1,26 @@
 import os
 import json
+import re
+from functools import reduce
 
 RUTA_BASE = os.path.dirname(os.path.abspath(__file__))
 RUTA_CLIENTES = os.path.join(RUTA_BASE, "clientes.json")
-RUTA_TRABAJADORES = os.path.join(RUTA_BASE, "trabajadores.json")
+RUTA_TECNICOS = os.path.join(RUTA_BASE, "tecnicos.json")
 
 listaClientes = []
-
-listaTrabajadores = []
-
+listaTecnicos = []
 listaDeTrabajosPendientes = []
 listaDeTrabajosTerminados = []
+
+TIPOS_TRABAJO = (
+    "limpieza de filtros",
+    "carga de gas",
+    "instalacion de aire",
+    "revision de perdida de agua",
+    "mantenimiento de aires",
+    "herreria liviana",
+    "otro",
+)
 
 def cargarClientes():
     global listaClientes
@@ -19,9 +29,14 @@ def cargarClientes():
             with open(RUTA_CLIENTES, "r", encoding="utf-8") as archivo:
                 listaClientes = json.load(archivo)
         except Exception as e:
-            print("ocurrio un error al cargar clientes.json, se usaran los datos por defecto:", e)
+            print("ocurrio un error al cargar clientes.json:", e)
     else:
-        # primera vez que se corre el programa: crea el archivo con los clientes de ejemplo
+        listaClientes = [
+            {"idCliente": 0, "nombre": "lucas milani", "direccion": "9JL 1282", "telefono": "+54 9 11 28323529"},
+            {"idCliente": 1, "nombre": "rosa fernandez", "direccion": "Av Corrientes 1420 piso 3B", "telefono": "+54 9 11 45671234"},
+            {"idCliente": 2, "nombre": "consorcio pringles", "direccion": "Pringles 850", "telefono": "+54 9 11 33445566"},
+            {"idCliente": 3, "nombre": "fabrica aberturas lopez", "direccion": "Av. San Martin 2100", "telefono": "+54 9 11 22334455"},
+        ]
         guardarClientes()
 
 
@@ -33,25 +48,31 @@ def guardarClientes():
         print("ocurrio un error al guardar clientes.json:", e)
 
 
-def cargarTrabajadores():
-    global listaTrabajadores
-    if os.path.exists(RUTA_TRABAJADORES):
+def cargarTecnicos():
+    global listaTecnicos
+    if os.path.exists(RUTA_TECNICOS):
         try:
-            with open(RUTA_TRABAJADORES, "r", encoding="utf-8") as archivo:
-                listaTrabajadores = json.load(archivo)
+            with open(RUTA_TECNICOS, "r", encoding="utf-8") as archivo:
+                listaTecnicos = json.load(archivo)
         except Exception as e:
-            print("ocurrio un error al cargar trabajadores.json, se usaran los datos por defecto:", e)
+            print("ocurrio un error al cargar tecnicos.json:", e)
     else:
-        # primera vez que se corre el programa: crea el archivo con los trabajadores de ejemplo
-        guardarTrabajadores()
+        listaTecnicos = [
+            {"idTecnico": 0, "nombre": "Carlos", "especialidad": "herreria y equipos comerciales"},
+            {"idTecnico": 1, "nombre": "Mellizo", "especialidad": "electricidad e instalacion de aires"},
+            {"idTecnico": 2, "nombre": "Fede", "especialidad": "mantenimiento y limpieza"},
+            {"idTecnico": 3, "nombre": "Santi", "especialidad": "logistica y traslado de materiales"},
+        ]
+        guardarTecnicos()
 
 
-def guardarTrabajadores():
+def guardarTecnicos():
     try:
-        with open(RUTA_TRABAJADORES, "w", encoding="utf-8") as archivo:
-            json.dump(listaTrabajadores, archivo, indent=4)
+        with open(RUTA_TECNICOS, "w", encoding="utf-8") as archivo:
+            json.dump(listaTecnicos, archivo, indent=4)
     except Exception as e:
-        print("ocurrio un error al guardar trabajadores.json:", e)
+        print("ocurrio un error al guardar tecnicos.json:", e)
+
 
 def cargaDeDatosCliente():
     idCliente = 0
@@ -70,8 +91,8 @@ def cargaDeDatosCliente():
         direccionCliente = input("la direccion no puede estar vacia: ")
 
     telefonoCliente = input("ingrese el numero del cliente: ")
-    while telefonoCliente == "":
-        telefonoCliente = input("el telefono no puede estar vacio: ")
+    while not re.match(r"^\+?[\d\s\-]{8,15}$", telefonoCliente):
+        telefonoCliente = input("formato invalido, ingrese un numero valido (ej: +54 9 11 12345678): ")
 
     nuevoCliente = {
         "idCliente": idCliente,
@@ -85,53 +106,53 @@ def cargaDeDatosCliente():
     print("cliente creado con exito :)")
 
 
-def cargaDatosTrabajador():
-    idTrabajador = 0
-    if len(listaTrabajadores) == 0:
-        idTrabajador = 0
+def cargaDatosTecnico():
+    idTecnico = 0
+    if len(listaTecnicos) == 0:
+        idTecnico = 0
     else:
-        idMaximo = listaTrabajadores[-1]["idTrabajador"]
-        idTrabajador = idMaximo + 1
+        idMaximo = listaTecnicos[-1]["idTecnico"]
+        idTecnico = idMaximo + 1
 
-    nombreTrabajador = input("ingrese el nombre del trabajador: ")
-    while nombreTrabajador == "" or nombreTrabajador.isdigit():
-        nombreTrabajador = input("el nombre no puede estar vacio ni ser un numero: ")
+    nombreTecnico = input("ingrese el nombre del tecnico: ")
+    while nombreTecnico == "" or nombreTecnico.isdigit():
+        nombreTecnico = input("el nombre no puede estar vacio ni ser un numero: ")
 
-    especialidad = input("ingrese la especialidad del trabajador (ej: electricidad, herreria): ")
+    especialidad = input("ingrese la especialidad del tecnico (ej: electricidad, herreria): ")
     while especialidad == "":
         especialidad = input("la especialidad no puede estar vacia: ")
 
-    nuevoTrabajador = {
-        "idTrabajador": idTrabajador,
-        "nombre": nombreTrabajador,
+    nuevoTecnico = {
+        "idTecnico": idTecnico,
+        "nombre": nombreTecnico,
         "especialidad": especialidad,
     }
 
-    listaTrabajadores.append(nuevoTrabajador)
-    guardarTrabajadores()
-    print("trabajador cargado con exito :)")
+    listaTecnicos.append(nuevoTecnico)
+    guardarTecnicos()
+    print("tecnico cargado con exito :)")
 
 
-def eliminarTrabajador():
-    if len(listaTrabajadores) == 0:
-        print("no hay trabajadores registrados")
+def eliminarTecnico():
+    if len(listaTecnicos) == 0:
+        print("no hay tecnicos registrados")
         return
 
-    print("=== trabajadores registrados ===")
-    for i in range(len(listaTrabajadores)):
-        print(str(i+1) + " - " + listaTrabajadores[i]["nombre"] + " | " + listaTrabajadores[i]["especialidad"])
+    print("=== tecnicos registrados ===")
+    for i in range(len(listaTecnicos)):
+        print(str(i+1) + " - " + listaTecnicos[i]["nombre"] + " | " + listaTecnicos[i]["especialidad"])
 
-    opcion = int(input("selecciona el numero del trabajador a eliminar (0 para cancelar): "))
-    while opcion < 0 or opcion > len(listaTrabajadores):
+    opcion = int(input("selecciona el numero del tecnico a eliminar (0 para cancelar): "))
+    while opcion < 0 or opcion > len(listaTecnicos):
         opcion = int(input("opcion invalida, elegi de nuevo: "))
 
     if opcion == 0:
         print("operacion cancelada")
         return
 
-    trabajadorEliminado = listaTrabajadores.pop(opcion - 1)
-    guardarTrabajadores()
-    print("trabajador eliminado: " + trabajadorEliminado["nombre"])
+    tecnicoEliminado = listaTecnicos.pop(opcion - 1)
+    guardarTecnicos()
+    print("tecnico eliminado: " + tecnicoEliminado["nombre"])
 
 
 def buscarCliente():
@@ -147,12 +168,13 @@ def buscarCliente():
         print("cliente no encontrado, volviendo al menu...")
     return indice
 
-def cantidadClientes(Index=0): # Funcion recursiva
+
+def cantidadClientes(Index=0):
     if Index >= len(listaClientes):
         return 0
-
     return 1 + cantidadClientes(Index + 1)
-    
+
+
 def asignarTrabajo():
     if len(listaClientes) == 0:
         print("no hay clientes registrados, cargue uno primero")
@@ -171,24 +193,34 @@ def asignarTrabajo():
     direccionAVisitar = clienteSeleccionado["direccion"]
     print("cliente seleccionado: " + clientePorAtender + " | " + direccionAVisitar)
 
-    trabajoARealizar = input("ingrese el trabajo hay que realizarle al cliente: ")
-    while trabajoARealizar == "":
-        trabajoARealizar = input("el trabajo no puede estar vacio: ")
+    print("=== tipo de trabajo ===")
+    for i in range(len(TIPOS_TRABAJO)):
+        print(str(i+1) + " - " + TIPOS_TRABAJO[i])
 
-    if len(listaTrabajadores) == 0:
-        print("no hay trabajadores registrados, cargue uno primero")
+    opcionTrabajo = int(input("selecciona el tipo de trabajo: "))
+    while opcionTrabajo < 1 or opcionTrabajo > len(TIPOS_TRABAJO):
+        opcionTrabajo = int(input("opcion invalida, elegi de nuevo: "))
+
+    trabajoARealizar = TIPOS_TRABAJO[opcionTrabajo - 1]
+    if trabajoARealizar == "otro":
+        trabajoARealizar = input("describí el trabajo a realizar: ")
+        while trabajoARealizar == "":
+            trabajoARealizar = input("el trabajo no puede estar vacio: ")
+
+    if len(listaTecnicos) == 0:
+        print("no hay tecnicos registrados, cargue uno primero")
         return
 
-    print("=== trabajadores disponibles ===")
-    for i in range(len(listaTrabajadores)):
-        print(str(i+1) + " - " + listaTrabajadores[i]["nombre"] + " | " + listaTrabajadores[i]["especialidad"])
+    print("=== tecnicos disponibles ===")
+    for i in range(len(listaTecnicos)):
+        print(str(i+1) + " - " + listaTecnicos[i]["nombre"] + " | " + listaTecnicos[i]["especialidad"])
 
-    opcionTrabajador = int(input("selecciona el numero del trabajador: "))
-    while opcionTrabajador < 1 or opcionTrabajador > len(listaTrabajadores):
-        opcionTrabajador = int(input("opcion invalida, elegi de nuevo: "))
+    opcionTecnico = int(input("selecciona el numero del tecnico: "))
+    while opcionTecnico < 1 or opcionTecnico > len(listaTecnicos):
+        opcionTecnico = int(input("opcion invalida, elegi de nuevo: "))
 
-    nombreDelTrabajador = listaTrabajadores[opcionTrabajador - 1]["nombre"]
-    print("trabajador seleccionado: " + nombreDelTrabajador)
+    nombreDelTecnico = listaTecnicos[opcionTecnico - 1]["nombre"]
+    print("tecnico seleccionado: " + nombreDelTecnico)
 
     horarioDeVisita = input("ingrese el horario de la visita (HH:MM): ")
     while True:
@@ -203,7 +235,7 @@ def asignarTrabajo():
             horarioDeVisita = input("formato invalido, ingrese la hora asi (HH:MM): ")
 
     fecha = input("ingrese la fecha del trabajo (DD/MM/AAAA): ")
-    while "/" not in fecha or len(fecha) != 10:
+    while not re.match(r"^\d{2}/\d{2}/\d{4}$", fecha):
         fecha = input("formato invalido, ingrese la fecha asi (DD/MM/AAAA): ")
 
     detalles = input("ingrese algun detalle o descripcion en caso de desearlo: ")
@@ -215,7 +247,7 @@ def asignarTrabajo():
         "clientePorAtender": clientePorAtender,
         "direccionAVisitar": direccionAVisitar,
         "trabajoARealizar": trabajoARealizar,
-        "nombreDelTrabajador": nombreDelTrabajador,
+        "nombreDelTecnico": nombreDelTecnico,
         "horarioDeVisita": horarioDeVisita,
         "fecha": fecha,
         "detalles": detalles,
@@ -227,32 +259,31 @@ def asignarTrabajo():
     listaDeTrabajosPendientes.append(nuevoTrabajo)
     print("trabajo asignado con exito!")
 
-def trabajosDeTrabajador(nombre, Index2=0): # Funcion recursiva
+
+def trabajosDeTecnico(nombre, Index2=0):
     if Index2 >= len(listaDeTrabajosPendientes):
         return 0
-
     suma = 0
-
-    if listaDeTrabajosPendientes[Index2]["nombreDelTrabajador"] == nombre:
+    if listaDeTrabajosPendientes[Index2]["nombreDelTecnico"] == nombre:
         suma = 1
+    return suma + trabajosDeTecnico(nombre, Index2 + 1)
 
-    return suma + trabajosDeTrabajador(nombre, Index2 + 1)
-    
+
 def cambioEstadoTrabajo():
-    nombreBuscado = input("ingrese el nombre del cliente: ")
+    direccionBuscada = input("ingrese la direccion del cliente: ")
     indice = None
 
     for i in range(len(listaDeTrabajosPendientes)):
-        if listaDeTrabajosPendientes[i]["clientePorAtender"].lower() == nombreBuscado.lower():
+        if listaDeTrabajosPendientes[i]["direccionAVisitar"].lower() == direccionBuscada.lower():
             indice = i
             break
 
     if indice == None:
-        print("no se encontro ningun trabajo para ese cliente")
+        print("no se encontro ningun trabajo para esa direccion")
         return
 
     t = listaDeTrabajosPendientes[indice]
-    print("trabajo encontrado: " + t["trabajoARealizar"] + " | estado actual: " + t["estado"])
+    print("trabajo encontrado: " + t["trabajoARealizar"] + " | cliente: " + t["clientePorAtender"] + " | estado actual: " + t["estado"])
 
     estadosTrabajo = ["pendiente", "en proceso", "terminado", "cobrado"]
     print("estados disponibles:")
@@ -292,7 +323,7 @@ def trabajoDelDia():
 
     print("=== trabajos para el " + fecha + ":")
     for t in encontrados:
-        print("  tecnico: " + t["nombreDelTrabajador"])
+        print("  tecnico: " + t["nombreDelTecnico"])
         print("  cliente: " + t["clientePorAtender"])
         print("  tarea: " + t["trabajoARealizar"])
         print("  hora: " + str(t["horarioDeVisita"]))
@@ -303,12 +334,14 @@ def mostrarUnTrabajo(t):
     print("  cliente: " + t["clientePorAtender"])
     print("  direccion: " + t["direccionAVisitar"])
     print("  tarea: " + t["trabajoARealizar"])
-    print("  tecnico: " + t["nombreDelTrabajador"])
+    print("  tecnico: " + t["nombreDelTecnico"])
     print("  fecha: " + t["fecha"] + " | hora: " + t["horarioDeVisita"])
     print("  estado: " + t["estado"])
     if t["detalles"] != "":
         print("  detalles: " + t["detalles"])
     deuda = t["precio"] - t["pagado"]
+    if deuda < 0:
+        deuda = 0
     print("  precio: $" + str(t["precio"]) + " | pagado: $" + str(t["pagado"]) + " | debe: $" + str(deuda))
     print("  ---")
 
@@ -365,7 +398,7 @@ def trabajosTotales():
 
     totalFacturado = sum(map(lambda x: x["precio"], listaDeTrabajosPendientes))
     totalCobrado = sum(map(lambda x: x["pagado"], listaDeTrabajosPendientes))
-    totalDeuda = totalFacturado - totalCobrado
+    totalDeuda = reduce(lambda acum, t: acum + (t["precio"] - t["pagado"]), listaDeTrabajosPendientes, 0)
 
     print("=== resumen de trabajos ===")
     print("total de trabajos: " + str(total))
@@ -379,10 +412,23 @@ def trabajosTotales():
     print("  total que te deben: $" + str(totalDeuda))
 
 
+def tecnicosOcupados():
+    ocupados = set()
+    for t in listaDeTrabajosPendientes:
+        if t["estado"] == "pendiente" or t["estado"] == "en proceso":
+            ocupados.add(t["nombreDelTecnico"])
+
+    if len(ocupados) == 0:
+        print("no hay tecnicos con trabajos asignados")
+        return
+
+    print("=== tecnicos con trabajos activos ===")
+    for nombre in ocupados:
+        print("  - " + nombre)
 
 
 cargarClientes()
-cargarTrabajadores()
+cargarTecnicos()
 
 opcion = ""
 while opcion != "0":
@@ -395,8 +441,9 @@ while opcion != "0":
     print("7  - Trabajos pendientes")
     print("8  - Trabajos realizados")
     print("9  - Resumen de trabajos (totales)")
-    print("10 - Cargar trabajador")
-    print("11 - Eliminar trabajador")
+    print("10 - Cargar tecnico")
+    print("11 - Eliminar tecnico")
+    print("12 - Tecnicos ocupados")
     print("0  - Salir")
     opcion = input("elegí una opción: ")
 
@@ -419,6 +466,8 @@ while opcion != "0":
     elif opcion == "9":
         trabajosTotales()
     elif opcion == "10":
-        cargaDatosTrabajador()
+        cargaDatosTecnico()
     elif opcion == "11":
-        eliminarTrabajador()
+        eliminarTecnico()
+    elif opcion == "12":
+        tecnicosOcupados()
