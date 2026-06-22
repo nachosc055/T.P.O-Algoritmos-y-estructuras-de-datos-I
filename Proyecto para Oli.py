@@ -147,7 +147,12 @@ def buscarCliente():
         print("cliente no encontrado, volviendo al menu...")
     return indice
 
+def cantidadClientes(Index=0): # Funcion recursiva
+    if Index >= len(listaClientes):
+        return 0
 
+    return 1 + cantidadClientes(Index + 1)
+    
 def asignarTrabajo():
     if len(listaClientes) == 0:
         print("no hay clientes registrados, cargue uno primero")
@@ -222,7 +227,17 @@ def asignarTrabajo():
     listaDeTrabajosPendientes.append(nuevoTrabajo)
     print("trabajo asignado con exito!")
 
+def trabajosDeTrabajador(nombre, Index2=0): # Funcion recursiva
+    if Index2 >= len(listaDeTrabajosPendientes):
+        return 0
 
+    suma = 0
+
+    if listaDeTrabajosPendientes[Index2]["nombreDelTrabajador"] == nombre:
+        suma = 1
+
+    return suma + trabajosDeTrabajador(nombre, Index2 + 1)
+    
 def cambioEstadoTrabajo():
     nombreBuscado = input("ingrese el nombre del cliente: ")
     indice = None
