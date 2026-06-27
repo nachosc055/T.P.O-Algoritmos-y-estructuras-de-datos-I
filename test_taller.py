@@ -52,7 +52,7 @@ def test_estado_de_pago():
 
 def test_deuda_por_cliente():
     datos.listaTrabajos = [
-        {"clientePorAtender": "rosa", "precio": 5000, "pagado": 1000, "nombreDelTecnico": "Carlos", "estado": "terminado"},
+        {"clientePorAtender": "rosa", "precio": 5000, "pagado": 1000, "nombreDelTecnico": "Carlos", "estado": "finalizado"},
         {"clientePorAtender": "rosa", "precio": 2000, "pagado": 0, "nombreDelTecnico": "Fede", "estado": "pendiente"},
         {"clientePorAtender": "lucas", "precio": 3000, "pagado": 3000, "nombreDelTecnico": "Mellizo", "estado": "cobrado"},
     ]

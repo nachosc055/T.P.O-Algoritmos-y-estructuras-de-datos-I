@@ -22,11 +22,11 @@ Enter. La opción `0` cierra el programa.
 ### Correr los tests
 
 ```bash
-python -m unittest test_taller
+python -m pytest
 ```
 
-(o también `python test_taller.py`). Son 12 tests que validan la lógica del
-sistema; si todo está bien termina con `OK`.
+Son 12 tests (escritos con **pytest**) que validan la lógica del sistema; si
+todo está bien termina con `12 passed`.
 
 ---
 
@@ -68,7 +68,7 @@ se crea o modifica algo, así no se pierden al cerrar el programa. Cada registro
 es una línea con los campos separados por `;` (se escribe con `open` en modo
 `"w"` y se lee con `open` en modo `"r"` y `.split(";")`, todo dentro de
 `try`/`except`). Si los archivos no existen, la primera ejecución los crea con
-datos de ejemplo (clientes y técnicos).
+datos de ejemplo (clientes, técnicos y trabajos).
 
 ---
 
@@ -92,16 +92,16 @@ en la etapa de análisis:
 
 ```
 -- Clientes --
-1  - Cargar cliente            (alta de un cliente nuevo, con validación de teléfono)
-2  - Buscar cliente            (busca por nombre y muestra la dirección)
+1  - Cargar cliente            (nombre, dirección, teléfono y tipo: particular / empresa)
+2  - Buscar cliente            (busca por parte del nombre y muestra los datos)
 
 -- Técnicos --
 3  - Cargar técnico
 4  - Eliminar técnico
 
 -- Trabajos --
-5  - Asignar trabajo           (elige cliente, tipo, técnico, fecha, hora y precio)
-6  - Cambiar estado de trabajo (pendiente / en proceso / terminado / cobrado)
+5  - Asignar trabajo           (elige cliente, descripción, técnico, fecha, hora y precio)
+6  - Cambiar estado de trabajo (pendiente / en curso / finalizado / cobrado)
 7  - Mostrar todos los trabajos
 8  - Trabajos pendientes
 9  - Trabajos realizados
@@ -112,20 +112,23 @@ en la etapa de análisis:
 12 - Hoja de ruta del técnico  (vista limpia para un técnico en una fecha)
 
 -- Cobros --
-13 - Registrar cobro           (admite pagos parciales; calcula el saldo)
+13 - Cargar / modificar precio (asigna o corrige el precio de un trabajo)
+14 - Registrar cobro           (admite pagos parciales con fecha; calcula el saldo)
 
 -- Resumen --
-14 - Resumen general           (activos, terminados sin cobrar, clientes con deuda)
-15 - Resumen de trabajos       (cantidades y totales de plata)
-16 - Matriz trabajos por técnico/estado
-17 - Técnicos ocupados
+15 - Resumen general           (activos, finalizados sin cobrar, clientes con deuda)
+16 - Resumen de trabajos       (cantidades y totales de plata)
+17 - Matriz trabajos por técnico/estado
+18 - Técnicos ocupados
 
 0  - Salir
 ```
 
 El estado de un trabajo sigue el ciclo:
-`pendiente → en proceso → terminado → cobrado`. Cuando se marca como **cobrado**
-el sistema pide el monto y calcula automáticamente cuánto resta cobrar.
+`pendiente → en curso → finalizado → cobrado`. El precio se puede cargar al
+asignar el trabajo o más tarde (opción 13). Al registrar un cobro se anota el
+monto y la fecha de cada pago, y el sistema calcula automáticamente cuánto
+resta cobrar.
 
 ---
 
@@ -137,7 +140,7 @@ Dónde se ve cada tema dentro del código:
 |---|---|
 | Listas | listas de clientes/técnicos/trabajos en `datos.py` |
 | Diccionarios | cada cliente/técnico/trabajo es un diccionario; deuda por cliente en `cobros.py` |
-| Tuplas | `TIPOS_TRABAJO` y `ESTADOS_TRABAJO` en `datos.py` (valores fijos) |
+| Tuplas | `TIPOS_CLIENTE` y `ESTADOS_TRABAJO` en `datos.py` (valores fijos) |
 | Conjuntos | `tecnicosOcupados()` en `dashboard.py` (evita técnicos repetidos) |
 | Funciones | todo el sistema está organizado en funciones |
 | Cadena de caracteres | armado de mensajes, `.lower()`, `.split()`, `.isdigit()`, `.ljust()` |
@@ -148,7 +151,7 @@ Dónde se ve cada tema dentro del código:
 | Excepciones | lectura/escritura de archivos en `datos.py` y `try/except` del menú en `main.py` |
 | Archivos | persistencia en `.txt` con `open` (modos `"r"`/`"w"`) y `.split(";")` en `datos.py` |
 | Matrices | `matrizTrabajosPorTecnicoEstado()` en `dashboard.py` (lista de listas técnico × estado) |
-| Test unitarios | `test_taller.py` (módulo `unittest`) |
+| Test unitarios | `test_taller.py` (con `pytest`) |
 
 ---
 
@@ -159,7 +162,8 @@ Dónde se ve cada tema dentro del código:
 - No se valida automáticamente la disponibilidad de los técnicos; el sistema
   muestra la carga de cada uno para que la persona decida.
 - El precio lo carga Oli a mano; el sistema no lo calcula solo.
-- Se admiten pagos parciales en varias tandas; no se distingue el medio de pago.
+- Se admiten pagos parciales en varias tandas y se registra la fecha de cada
+  pago; no se distingue el medio de pago.
 - No se guarda DNI ni CUIT de los clientes.
 - Como los archivos usan `;` para separar los campos, los textos libres (nombre,
   dirección, detalles) no deberían contener ese carácter.

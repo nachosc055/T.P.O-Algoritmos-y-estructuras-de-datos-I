@@ -21,19 +21,10 @@ def asignarTrabajo():
     direccionAVisitar = clienteSeleccionado["direccion"]
     print("cliente seleccionado: " + clientePorAtender + " | " + direccionAVisitar)
 
-    print("=== tipo de trabajo ===")
-    for i in range(len(datos.TIPOS_TRABAJO)):
-        print(str(i + 1) + " - " + datos.TIPOS_TRABAJO[i])
-
-    opcionTrabajo = int(input("selecciona el tipo de trabajo: "))
-    while opcionTrabajo < 1 or opcionTrabajo > len(datos.TIPOS_TRABAJO):
-        opcionTrabajo = int(input("opcion invalida, elegi de nuevo: "))
-
-    trabajoARealizar = datos.TIPOS_TRABAJO[opcionTrabajo - 1]
-    if trabajoARealizar == "otro":
-        trabajoARealizar = input("describi el trabajo a realizar: ")
-        while trabajoARealizar == "":
-            trabajoARealizar = input("el trabajo no puede estar vacio: ")
+    # descripcion en texto libre (ej: "perdida de agua en el equipo del living")
+    trabajoARealizar = input("describi el trabajo a realizar: ")
+    while trabajoARealizar == "":
+        trabajoARealizar = input("el trabajo no puede estar vacio: ")
 
     if len(datos.listaTecnicos) == 0:
         print("no hay tecnicos registrados, cargue uno primero")
@@ -74,6 +65,7 @@ def asignarTrabajo():
         "estado": "pendiente",
         "precio": precio,
         "pagado": 0,
+        "pagos": [],
     }
 
     datos.listaTrabajos.append(nuevoTrabajo)
@@ -126,6 +118,8 @@ def mostrarUnTrabajo(t):
         print("  detalles: " + t["detalles"])
     deuda = cobros.saldoDeudor(t)
     print("  precio: $" + str(t["precio"]) + " | pagado: $" + str(t["pagado"]) + " | debe: $" + str(deuda))
+    for p in t["pagos"]:
+        print("    pago: $" + str(p["monto"]) + " el " + p["fecha"])
     print("  ---")
 
 
@@ -139,7 +133,7 @@ def mostrarTrabajos():
 
 
 def trabajosPendientes():
-    encontrados = list(filter(lambda t: t["estado"] in ("pendiente", "en proceso"), datos.listaTrabajos))
+    encontrados = list(filter(lambda t: t["estado"] in ("pendiente", "en curso"), datos.listaTrabajos))
 
     if len(encontrados) == 0:
         print("no hay trabajos pendientes, estan todos al dia :)")
@@ -151,7 +145,7 @@ def trabajosPendientes():
 
 
 def trabajosRealizados():
-    encontrados = list(filter(lambda t: t["estado"] in ("terminado", "cobrado"), datos.listaTrabajos))
+    encontrados = list(filter(lambda t: t["estado"] in ("finalizado", "cobrado"), datos.listaTrabajos))
 
     if len(encontrados) == 0:
         print("todavia no hay trabajos realizados")

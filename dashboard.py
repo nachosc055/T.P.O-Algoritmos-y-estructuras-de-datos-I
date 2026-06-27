@@ -11,8 +11,8 @@ def trabajosTotales():
         return
 
     pendientes = len(list(filter(lambda x: x["estado"] == "pendiente", datos.listaTrabajos)))
-    enProceso = len(list(filter(lambda x: x["estado"] == "en proceso", datos.listaTrabajos)))
-    terminados = len(list(filter(lambda x: x["estado"] == "terminado", datos.listaTrabajos)))
+    enCurso = len(list(filter(lambda x: x["estado"] == "en curso", datos.listaTrabajos)))
+    finalizados = len(list(filter(lambda x: x["estado"] == "finalizado", datos.listaTrabajos)))
     cobrados = len(list(filter(lambda x: x["estado"] == "cobrado", datos.listaTrabajos)))
 
     totalFacturado = sum(map(lambda x: x["precio"], datos.listaTrabajos))
@@ -22,8 +22,8 @@ def trabajosTotales():
     print("=== resumen de trabajos ===")
     print("total de trabajos: " + str(total))
     print("  pendientes: " + str(pendientes))
-    print("  en proceso: " + str(enProceso))
-    print("  terminados: " + str(terminados))
+    print("  en curso: " + str(enCurso))
+    print("  finalizados: " + str(finalizados))
     print("  cobrados: " + str(cobrados))
     print("  -------------------------")
     print("  total facturado: $" + str(totalFacturado))
@@ -34,7 +34,7 @@ def trabajosTotales():
 def tecnicosOcupados():
     ocupados = set()
     for t in datos.listaTrabajos:
-        if t["estado"] in ("pendiente", "en proceso"):
+        if t["estado"] in ("pendiente", "en curso"):
             ocupados.add(t["nombreDelTecnico"])
 
     if len(ocupados) == 0:
@@ -86,13 +86,13 @@ def mostrarMatriz():
 def resumenGeneral():
     print("=========== RESUMEN GENERAL ===========")
 
-    activos = list(filter(lambda t: t["estado"] in ("pendiente", "en proceso"), datos.listaTrabajos))
-    print("\n-- trabajos activos (pendientes / en proceso): " + str(len(activos)))
+    activos = list(filter(lambda t: t["estado"] in ("pendiente", "en curso"), datos.listaTrabajos))
+    print("\n-- trabajos activos (pendientes / en curso): " + str(len(activos)))
     for t in activos:
         print("  - " + t["clientePorAtender"] + " | " + t["trabajoARealizar"] + " | " + t["estado"])
 
-    sinCobrar = list(filter(lambda t: t["estado"] == "terminado", datos.listaTrabajos))
-    print("\n-- trabajos terminados sin cobrar: " + str(len(sinCobrar)))
+    sinCobrar = list(filter(lambda t: t["estado"] == "finalizado", datos.listaTrabajos))
+    print("\n-- trabajos finalizados sin cobrar: " + str(len(sinCobrar)))
     for t in sinCobrar:
         print("  - " + t["clientePorAtender"] + " | debe: $" + str(cobros.saldoDeudor(t)))
 

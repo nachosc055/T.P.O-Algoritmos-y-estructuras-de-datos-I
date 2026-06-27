@@ -26,12 +26,13 @@ def mostrarMenu():
     print("11 - Agenda por tecnico")
     print("12 - Hoja de ruta del tecnico")
     print("-- Cobros --")
-    print("13 - Registrar cobro")
+    print("13 - Cargar / modificar precio de un trabajo")
+    print("14 - Registrar cobro")
     print("-- Resumen --")
-    print("14 - Resumen general")
-    print("15 - Resumen de trabajos (totales)")
-    print("16 - Matriz trabajos por tecnico/estado")
-    print("17 - Tecnicos ocupados")
+    print("15 - Resumen general")
+    print("16 - Resumen de trabajos (totales)")
+    print("17 - Matriz trabajos por tecnico/estado")
+    print("18 - Tecnicos ocupados")
     print("0  - Salir")
 
 
@@ -49,11 +50,12 @@ acciones = {
     "10": agenda.trabajoDelDia,
     "11": agenda.agendaPorTecnico,
     "12": agenda.hojaDeRutaTecnico,
-    "13": cobros.registrarCobro,
-    "14": dashboard.resumenGeneral,
-    "15": dashboard.trabajosTotales,
-    "16": dashboard.mostrarMatriz,
-    "17": dashboard.tecnicosOcupados,
+    "13": cobros.cargarPrecio,
+    "14": cobros.registrarCobro,
+    "15": dashboard.resumenGeneral,
+    "16": dashboard.trabajosTotales,
+    "17": dashboard.mostrarMatriz,
+    "18": dashboard.tecnicosOcupados,
 }
 
 
